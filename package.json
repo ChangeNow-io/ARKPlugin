@@ -1,0 +1,21 @@
+{
+  "name": "cn-ark-plugin",
+  "version": "0.0.1",
+  "title": "ChangeNOW Plugin",
+  "description": "ChangeNOW plugin on Ark Desktop Wallet",
+  "main": "src/index.js",
+  "permissions": [
+    "COMPONENTS",
+    "HTTP",
+    "MENU_ITEMS",
+    "MESSAGING",
+    "PROFILE_CURRENT",
+    "ROUTES",
+    "STORAGE",
+    "UI_COMPONENTS",
+    "WEBFRAME"
+  ],
+  "urls": [
+    "https://changenow.io/api/v1"
+  ]
+}
