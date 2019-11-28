@@ -5,6 +5,11 @@ module.exports = {
         path: '/change-now',
         name: 'change-now',
         component: 'ExchangeForm'
+      },
+      {
+        path: '/stepper/:from/:to/:amount',
+        name: 'stepper',
+        component: 'Stepper'
       }
     ]
 
