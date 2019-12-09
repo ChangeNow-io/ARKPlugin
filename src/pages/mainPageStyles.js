@@ -1,3 +1,5 @@
+const colorGreen = '#3bee81';
+
 const mainContainer = `
   display: flex;
   align-items: center;
@@ -18,7 +20,6 @@ const subTitle = `
 
 const mainBlock = `
   padding: 20xp;
-  border: 2px solid white;
 `
 
 const block = `
@@ -47,7 +48,7 @@ const exchangeButton = `
   height: 46px;
   line-height: 46px;
   padding: 0 46px;
-  background: #3bee81;
+  background: ${colorGreen};
   border: none;
   color: #fff;
   font-size: 20px;
@@ -77,20 +78,25 @@ const exchangeInputSearch = `
   position: absolute;
   right: 0;
   top: 0;
-  padding-left: 10px;
+  padding-left: 8px;
   border-left: 1px solid #5e5a72;
   width: 140px;
   height: 70px;
-  font-size: 22px;
+  font-size: 20px;
   color: white;
   display: flex;
   align-items: center;
+  text-transform: uppercase;
 `;
 
+const subName = `
+  font-size: 10px;
+  top: -0.9em;
+`;
 
 const arrow = `
   position: absolute;
-  right: 14px;
+  right: 10px;
   top: 32px;
   border: 6px solid transparent; 
   border-top: 6px solid white;
@@ -129,8 +135,101 @@ const exchangeSequence = `
   color: white;
 `;
 
-const toggleButton = ``;
+const toggleButton = `
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  right: 10px;
+  top: 15px;
+  color: ${colorGreen};
+  cursor: pointer;
+  display: flex;
+`;
 
+const coinIcon = `
+  width: 20px;
+  margin-right: 5px;
+  filter: invert(95%) sepia(57%) saturate(4466%) hue-rotate(69deg) brightness(86%) contrast(85%);
+`;
+
+const selectFromWrapper = `
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  z-index: 10;
+`;
+
+const selectContainer = `
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  border-radius: 4px;
+  background-color: white;
+  width: 330px;
+  z-index: 15;
+`;
+
+const searchInput = `
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #b6c0cb;
+  font-size: 16px;
+  margin-bottom: 0;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 40px;
+`;
+
+const currencyListContainer = `
+  overflow: scroll;
+  max-height: 250px;
+  padding: 5px 0;
+`
+
+const currencyList = `
+  list-style: none;
+  padding: 0 5px;
+  margin: 0;
+  color: black;
+`;
+
+const currencyItem = `
+  display: flex;
+  padding: 2px 14px;
+  cursor: pointer;
+  display: flex;
+  font-size: 12px;
+  align-items: center;
+`;
+
+const coinTicker = `
+  flex: 2;
+  text-transform: uppercase;
+  padding-left: 5px;
+`;
+
+const coinName = `
+  flex: 3;
+  color: #ccc;
+  text-align: left;
+  word-break: break-all;
+`;
+
+const inputLoader = `
+  position: absolute;
+  bottom: 14px;
+  left: 20px;
+  color: ${colorGreen};
+`;
+
+const sreachIcon = `
+  position: absolute;
+  color: #d7dfe8;
+  left: 10px;
+  top: 10px;
+`;
 
 module.exports = {
   mainContainer,
@@ -150,5 +249,17 @@ module.exports = {
   circle,
   line,
   exchangeSequence,
-  toggleButton
+  toggleButton,
+  coinIcon,
+  selectFromWrapper,
+  selectContainer,
+  searchInput,
+  currencyListContainer,
+  currencyItem,
+  currencyList,
+  coinTicker,
+  coinName,
+  inputLoader,
+  sreachIcon,
+  subName
 }

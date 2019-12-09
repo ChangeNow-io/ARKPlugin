@@ -39,6 +39,12 @@ class ApiWorker {
     const data = JSON.parse(res.body);
     return data;
   }
+
+  async getCurrencyInfo (ticker) {
+    const res = await this.client.get(`${API_BASE_URL}/currencies/${ticker}`);
+    const data = JSON.parse(res.body);
+    return data;
+  }
 }
 
 module.exports = ApiWorker;
