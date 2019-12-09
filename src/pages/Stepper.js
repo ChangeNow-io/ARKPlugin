@@ -171,7 +171,16 @@ const addressInputWrapper = `
   width: 100%;
   max-width: 540px;
   margin-bottom: 20px;
+  positon: relative;
 `
+
+const inputSuccesValid = `
+  position: absolute;
+  right: 10px;
+  background-color: white;
+  bottom: 10px;
+  color: #3bee81;
+`;
 
 const addressInput = `
   width: 100%;
@@ -409,6 +418,7 @@ module.exports = {
                   class="border border-solid focus:border-green border-gray-400" 
                   style="${addressInput}" 
                   :placeholder="recipientPlace"/>
+                  <div v-if="recipientWallet && isValidRecipient" style="${inputSuccesValid}"><font-awesome-icon  :icon="faCheck" size="lg"/></div>
               </div>
               <p v-if="recipientWallet && !isValidRecipient && !recipientFocus" 
                 class="text-xs" 
@@ -426,6 +436,7 @@ module.exports = {
                   class="border border-solid focus:border-green border-gray-400"
                   style="${addressInput}" 
                   :placeholder="exstraIdPalce"/>
+                  <div v-if="externalId && isValidExternalId" style="${inputSuccesValid}"><font-awesome-icon  :icon="faCheck" size="lg"/></div>
               </div>
               <p v-if="externalId && !isValidExternalId && !externalIdFocus" 
                 class="text-xs" style="${inputError}">{{exstraIdValidError}}</p>
@@ -441,6 +452,7 @@ module.exports = {
                   style="${addressInput}"
                   class="border border-solid focus:border-green border-gray-400" 
                   :placeholder="refundPlace"/>
+                  <div v-if="refundWallet && isValidRefund" style="${inputSuccesValid}"><font-awesome-icon  :icon="faCheck" size="lg"/></div>
               </div>
               <p v-if="refundWallet && !isValidRefund && !refundFocus"
                 class="text-xs" style="${inputError}">This address is not valid</p>
