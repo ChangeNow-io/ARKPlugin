@@ -17,12 +17,28 @@ const errorType = {
 	SMALL_DEPOSIT: 'deposit_too_small'
 }
   
-const statuses = ['new', 'waiting', 'confirming', 'exchanging', 'sending', 'finished', 'failed'];
+
+const statuses = {
+	waiting: 'waiting', 
+	confirming:  'confirming', 
+	exchanging: 'exchanging', 
+	sending: 'sending', 
+	finished: 'finished',
+	failed: 'failed',
+	refunded: 'refunded', 
+	expired: 'expired'
+  };
+  
+const finishedStatuses = [ 'finished', 'failed', 'refunded', 'expired' ];
+
+const mokStatuses = ['new', 'waiting', 'confirming', 'exchanging', 'sending', 'finished', 'failed'];
 
 module.exports = {
 	defaultFrom,
 	defaultTo,
 	longName,
 	errorType,
-	statuses
+	statuses,
+	finishedStatuses,
+	mokStatuses
 }

@@ -45,6 +45,41 @@ class ApiWorker {
     const data = JSON.parse(res.body);
     return data;
   }
+
+    // params = {
+      // from (Required): Ticker of a currency you want to send
+      // to (Required): Ticker of a currency you want to receive
+      // address (Required): Address to receive a currency
+      // amount (Required): Amount you want to exchange
+      // extraId (Optional): Extra Id for currencies that require it
+      // refundAddress (Optional): Refund address
+  // }
+  async createTransaction (params) {
+    const options = {
+      json: true,
+      headers: {
+        'Content-type': 'application/json'
+      },
+      body: params
+    };
+    const { body } = await this.client.post(`${API_BASE_URL}/transactions/${API_KEY}`, options);
+    return body;
+  }
+    // GET /api/v1/transactions/:id/:api_key
+  // new
+  // waiting
+  // confirming
+  // exchanging
+  // sending
+  // finished
+  // failed
+  // refunded
+  // expired
+  async getTransactionStatus (id) {
+    const res = await this.client.get(`${API_BASE_URL}/transactions/${id}/${API_KEY}`);
+    const data = JSON.parse(res.body);
+    return data;
+  }
 }
 
 module.exports = ApiWorker;

@@ -87,6 +87,8 @@ module.exports = {
             <div style="${circle}"></div>
             <div style="${line}"></div>
             <span style="${exchangeSequence}">{{sequence}}</span>
+            <a href="https://changenow.io/faq/what-is-the-expected-exchange-rate" target="blank" class="no-underline pl-3"
+            style="color: #3bee81; font-size: 12px;">Expected rate</a>
             <div style="${toggleButton}" @click="toggleCurrancies">
               <font-awesome-icon :icon="upArrow" size="lg"/>
               <font-awesome-icon :icon="downArrow" size="lg"/>
@@ -304,6 +306,11 @@ module.exports = {
       const storageFrom = walletApi.storage.get('fromCurrency')
       const storageAmount = walletApi.storage.get('amount');
       const storageTo = walletApi.storage.get('toCurrency');
+      const lastId = walletApi.storage.get('transactionId'); 
+      if (lastId) {
+        walletApi.route.goTo('stepper');
+        return;
+      }
       
       if (storageFrom) {
         this.from = storageFrom;

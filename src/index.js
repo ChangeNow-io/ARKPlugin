@@ -4,12 +4,12 @@ module.exports = {
       {
         path: '/change-now',
         name: 'change-now',
-        component: 'ExchangeForm'
+        component: 'MainPage'
       },
       {
         path: '/stepper',
         name: 'stepper',
-        component: 'Stepper'
+        component: 'StepperPage'
       }
     ]
 

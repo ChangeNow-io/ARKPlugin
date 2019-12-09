@@ -1,6 +1,6 @@
 const ApiWorker = require('../apiWorker');
 const style = require('./mainPageStyles');
-const { defaultFrom, defaultTo, errorType, longName } = require('../constants');
+const { defaultFrom, defaultTo, errorType, longName, statuses, finishedStatuses } = require('../constants');
 const { valiateAddress, valiateExternalId } = require('../utils/validators');
 
 const {
@@ -17,10 +17,10 @@ const {
   coinTicker,
   inputLoader,
   sreachIcon,
-  subName
+  subName,
 } = style;
 
-const { faArrowsAltV, faSpinner, faLongArrowAltDown, faLongArrowAltUp, faSearch, faArrowRight, faCheck } = walletApi.fontAwesomeIcons;
+const { faArrowsAltV, faSpinner, faLongArrowAltDown, faLongArrowAltUp, faSearch, faArrowRight, faCheck, faCheckCircle, faTimesCircle } = walletApi.fontAwesomeIcons;
 // const { faArrowsAltV, faSpinner, faLongArrowAltDown, faLongArrowAltUp, faSearch, faArrowRight, faCheck } = walletApi.icons.icons;
 
 const mainContainer = `
@@ -57,12 +57,15 @@ const stepContainer = `
 const stepHeader = `
   width: 100%;
   height: 40px;
+  padding: 10px 0;
   display: flex;
   align-items: center;
 `;
 
 const stepNumber = `
   width: 30px;
+  min-width: 30px;
+  flex-basis: 30px;
   height: 30px;
   border-radius: 50%;
   border: 2px solid #3bee81;
@@ -75,6 +78,7 @@ const stepNumber = `
 
 const stepName = `
   font-weight: 600;
+  font-size: 16px;
 `;
 
 const stepBody = `
@@ -311,6 +315,25 @@ const exchangeInputError = `
   font-size: 12px;
 `;
 
+const stepThreeBlock = `
+  margin-bottom: 8px;
+`;
+
+const infoHeader = `
+  font-size: 15px;
+  line-height: 22px;
+  letter-spacing: .3px;
+  color: #2b2b37;
+`;
+
+const infoContent = `
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: .5px;
+  word-break: break-all;
+`;
+
 module.exports = {
   template: `
     <div class="rounded-lg p-3 " style="${mainContainer}">
@@ -360,6 +383,8 @@ module.exports = {
                 <div style="${circle}"></div>
                 <div style="${line}"></div>
                 <span style="${exchangeSequence}">{{sequence}}</span>
+                <a href="https://changenow.io/faq/what-is-the-expected-exchange-rate" target="blank" class="no-underline pl-3"
+                  style="color: #3bee81; font-size: 12px;">Expected rate</a>
                 <div style="${toggleButton}" @click="toggleCurrancies">
                   <font-awesome-icon :icon="upArrow" size="lg"/>
                   <font-awesome-icon :icon="downArrow" size="lg"/>
@@ -458,12 +483,17 @@ module.exports = {
                 class="text-xs" style="${inputError}">This address is not valid</p>
             </div>
           </div>
-          <button v-if="!validParams" style="${stepButton} ${disabledButton}" 
+          <div style="${buttonsBlock}">
+            <button v-if="!validParams" style="${stepButton} ${disabledButton}" 
             class="hover:opacity-75 disabled:bg-gray" :disabled="!validParams" 
             >Next</button>
-          <button v-else style="${stepButton} ${buttonGreen}" 
-          class="hover:opacity-75 disabled:bg-gray" :disabled="!validParams" 
-          @click.prevent="switchToTwoStep">Next</button>
+            <button v-else style="${stepButton} ${buttonGreen}" 
+            class="hover:opacity-75 disabled:bg-gray" :disabled="!validParams" 
+            @click.prevent="switchToTwoStep">Next</button>
+            <router-link :to="{ name: 'change-now'}">
+              <button class="hover:opacity-75" style="${stepButton} ${buttonWhite}">Back</button>
+            </router-link>  
+          </div>
         </div>
         <div v-if="currentStep === 2" style="${stepContainer}">
           <div style="${stepHeader}">
@@ -505,8 +535,75 @@ module.exports = {
           </div>
           <div style="${buttonsBlock}">
             <button v-if="!confirm" style="${stepButton} ${disabledButton}" :disabled="!confirm">Confirm</button>
-            <button v-else style="${stepButton} ${buttonGreen}" >Confirm</button>
+            <button v-else style="${stepButton} ${buttonGreen}" @click.prevent="createExchange">Confirm</button>
             <button style="${stepButton} ${buttonWhite}" @click.prevent="switchToOneStep">Back</button>
+          </div>
+        </div>
+        <div v-if="currentStep === 3 && transaction" style="${stepContainer}">
+          <div style="${stepHeader}">
+            <div style="${stepNumber}">3</div>
+            <span style="${stepName} color: #a4a3aa">Sending</span>
+            <span class="m-4" style="color: #a4a3aa; font-size: 16px;">Transaction Id: {{transaction.id}}</span>
+          </div>
+          <div style="${stepBody}">
+            <div style="border: 2px solid #3bee81; padding: 5px 65px 5px 10px; max-width: 650px;" class="mb-4">
+              <div style="${stepThreeBlock}">
+                <p style="${infoHeader}">You send</p>
+                <p style="${infoContent} text-transform:uppercase;">{{transaction.expectedSendAmount}} {{transaction.fromCurrency}}</p>
+              </div>
+              <div style="${stepThreeBlock}">
+                <p style="${infoHeader}">To address</p>
+                <p style="${infoContent}">{{transaction.payinAddress}} <ButtonClipboard :value="transaction.payinAddress" class="text-theme-page-text-light mx-2"/></p>
+              </div>
+              <div style="${stepThreeBlock}" v-if="transaction.payinExtraId">
+                <p style="${infoHeader}">{{transaction.payinExtraIdName}}</p>
+                <p style="${infoContent}">{{transaction.payinExtraId}} <ButtonClipboard :value="transaction.payinExtraId" class="text-theme-page-text-light mx-2"/></p>
+              </div>
+            </div>
+            <div style="padding: 5px 65px 5px 10px;" class="mb-4">
+              <div style="${stepThreeBlock}">
+                <p style="${infoHeader}">You get</p>
+                <p style="${infoHeader} font-size: 18px; text-transform:uppercase;"> ≈ {{transaction.expectedReceiveAmount}} {{transaction.toCurrency}}</p>
+              </div>
+              <div style="${stepThreeBlock}">
+                <p style="${infoHeader}">To address</p>
+                <p style="${infoHeader} font-size: 18px; word-break: break-all;">{{transaction.payoutAddress}}</p>
+              </div>
+            </div>
+            <div v-if="!isTransactionFinished" style="exchangeStatuses" class="flex items-center justify-center flex-col md:flex-row">
+              <div style="height: 35px; border: 2px solid rgba(61,61,112,.04);" class="md:w-1/3 w-full mb-1 md:mx-1  flex items-center justify-center">
+                <font-awesome-icon v-if="confirmingStatus" :icon="faCheckCircle" size="lg" style="color: #3bee81;"/>
+                <font-awesome-icon v-else :icon="spinner" size="lg" rotation="180" spin style="color: #3bee81;"/>
+                <span class="ml-2">Awaiting deposit</span>
+              </div>
+              <div style="height: 35px; border: 2px solid rgba(61,61,112,.04);" class="md:w-1/3 w-full mb-1 md:mx-1  flex items-center justify-center">
+                <font-awesome-icon v-if="exchangingStatus" :icon="faCheckCircle" size="lg" style="color: #3bee81;"/>
+                <font-awesome-icon v-else :icon="spinner" size="lg" rotation="180" spin style="color: #3bee81;"/>
+                <span class="ml-2">Exchanging</span>
+              </div>
+              <div style="height: 35px; border: 2px solid rgba(61,61,112,.04);" class="md:w-1/3 w-full mb-1 md:mx-1 flex items-center justify-center">
+                <font-awesome-icon v-if="sendingStatus" :icon="faCheckCircle" size="lg" style="color: #3bee81;"/>
+                <font-awesome-icon v-else :icon="spinner" size="lg" rotation="180" spin style="color: #3bee81;"/>
+                <span class="ml-2">Sending to your wallet</span>
+              </div>
+            </div>
+            <div v-if="transaction.status === statuses.failed" class="px-4 py-3 rounded my-1" style="background-color: #fff5f5;	">
+              <span class="block sm:inline" style="color: #e53e3e;">Error during exchange. Please contact support.</span>
+            </div>
+            <div v-if="transaction.status === statuses.finished" class="px-4 py-3 rounded my-1" style="background-color: #f0fff4;	">
+              <span class="block sm:inline" style="color: #38a169;">Exchange completed.</span>
+            </div>
+            <div v-if="transaction.status === statuses.finished" style="padding: 5px 65px 5px 10px;" class="mb-4">
+              <div style="${stepThreeBlock}">
+                <p style="${infoHeader} font-weight: 600;">Input Transaction Hash</p>
+                <p style="${infoHeader} font-size: 18px; word-break: break-all;">{{transaction.payinHash}}</p>
+              </div>
+              <div style="${stepThreeBlock}">
+                <p style="${infoHeader} font-weight: 600;">Output Transaction Hash</p>
+                <p style="${infoHeader} font-size: 18px;  word-break: break-all;">{{transaction.payoutHash}}</p>
+              </div>
+            </div>
+            <button @click="startNewTransaction">Start new transaction</button>
           </div>
         </div>
       </div>
@@ -526,6 +623,8 @@ module.exports = {
       downArrow: faLongArrowAltDown,
       faSearch: faSearch,
       faArrowRight: faArrowRight,
+      faCheckCircle: faCheckCircle,
+      faTimesCircle: faTimesCircle,
 
       amount: 0.1,
       amountTo: 0,
@@ -559,7 +658,14 @@ module.exports = {
       amountError: false,
       minAmount: 0,
       transactionTime: '',
-      longName: {}
+      longName: {},
+      isEnabled: false,
+      // Step 3
+      transaction: null,
+      creating: false,
+      statusTimer: null,
+      finishedStatuses,
+      statuses,
     }
   },
 
@@ -632,6 +738,34 @@ module.exports = {
         return Boolean(isValidRecipient && isValidRefund && isValidExternalId && !this.hasError && !this.amountError);
       }
       return false
+    },
+    confirmingStatus () {
+      if (this.transaction) {
+        const { status } = this.transaction;
+        return status === statuses.confirming || status === statuses.exchanging || status === statuses.sending;
+      } 
+      return false;
+    },
+    exchangingStatus () {
+      if (this.transaction) {
+        const { status } = this.transaction;
+        return status === statuses.exchanging || status === statuses.sending;
+      } 
+      return false;
+    },
+    sendingStatus () {
+      if (this.transaction) {
+        const { status } = this.transaction;
+        return status === statuses.sending;
+      } 
+      return false;
+    },
+    isTransactionFinished () {
+      if (this.transaction) {
+        const { status } = this.transaction;
+        return this.finishedStatuses.includes(status);
+      } 
+      return false;
     }
   },
   methods: {
@@ -760,11 +894,65 @@ module.exports = {
         return true;
       }
     },
+    async createExchange () {
+      if (this.validParams) {
+        const params = {
+          from: this.from.ticker,
+          to: this.to.ticker,
+          address: this.recipientWallet,
+          amount: this.amount,
+        }
+
+        if (this.externalId) { params.extraId = this.externalId; }
+        if (this.refundWallet) { params.refundAddress = this.refundWallet; }
+        this.creating = true;
+        try {
+          this.statusTimer = walletApi.timers.setInterval(() => {
+            this.checkTransactionStatus();
+          }, 5000);
+          const transaction = await this.api.createTransaction(params);
+          walletApi.storage.set('transactionId', transaction.id);
+          this.transaction = transaction;
+          await this.checkTransactionStatus();
+          this.currentStep = 3;
+        } catch (error) {
+          walletApi.alert.error(`Faled to create transaction.`);
+        } finally {
+          this.creating = false;
+        }
+      }
+    },
+    async checkTransactionStatus () {
+      if (!this.transaction) {
+        return;
+      }
+      const { id } = this.transaction;
+      const transactionData = await this.api.getTransactionStatus(id);
+
+      this.transaction = transactionData;
+      if (finishedStatuses.includes(transactionData.status)) {
+        walletApi.storage.set('transactionId', null);
+        walletApi.timers.clearInterval(this.statusTimer);
+      }
+    },
     async initialize () {
       this.initializing = true;
       const storageFrom = walletApi.storage.get('fromCurrency')
       const storageAmount = walletApi.storage.get('amount');
       const storageTo = walletApi.storage.get('toCurrency');
+      const lastId = walletApi.storage.get('transactionId'); 
+      if (lastId) {
+        this.statusTimer = walletApi.timers.setInterval(() => {
+          this.checkTransactionStatus();
+        }, 5000);
+        this.transaction = {
+          id: lastId
+        };
+        await this.checkTransactionStatus();
+        this.currentStep = 3;
+        this.initializing = false;
+        return;
+      }
       
       if (storageFrom) {
         this.from = storageFrom;
@@ -800,6 +988,10 @@ module.exports = {
     },
     switchToOneStep () {
       this.currentStep = 1;
+    },
+    startNewTransaction () {
+      walletApi.storage.set('transactionId', null);
+      walletApi.route.goTo('change-now');
     }
   }, 
   created() {
