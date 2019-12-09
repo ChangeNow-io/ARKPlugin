@@ -70,6 +70,7 @@ const stepNumber = `
   align-items: center;
   justify-content: center;
   margin-right: 12px;
+  font-weight: 600;
 `;
 
 const stepName = `
@@ -210,13 +211,6 @@ const disabledButton = `
   color: white;
 `;
 
-
-const confirmInfo = `
-  display: flex;
-  width: 100%;
-  align-items: center;
-`;
-
 const confirmInfoData = `
   display: flex;
   flex-direction: column;
@@ -233,7 +227,6 @@ const confirmInfoLabel = `
 const confirmArrow = `
   font-size: 36px;
   color: #d1cfdd;
-  padding: 0 20px;
 `;
 
 const confirmInfoAmount = `
@@ -466,18 +459,18 @@ module.exports = {
             <span style="${stepName}">Confirmation</span>
           </div>
           <div style="${stepBody}">
-            <div style="${confirmInfo}">
-              <div style="${confirmInfoData}">
+            <div class="flex flex-col md:flex-row md:items-center">
+              <div style="${confirmInfoData}" class="pr-6">
                 <span style="${confirmInfoLabel}">You Send</span>
                 <span style="${confirmInfoAmount}">{{amount}} {{from.ticker}}</span>
                 <span style="${confirmInfoSub}">{{sequence}}</span>
               </div>
-              <div style="${confirmArrow}">
+              <div style="${confirmArrow}" class="md:block hidden">
                 <font-awesome-icon :icon="faArrowRight" size="lg"/>
               </div>
-              <div style="${confirmInfoData}">
+              <div style="${confirmInfoData}" class="md:pl-6">
                 <span style="${confirmInfoLabel}">You Get</span>
-                <span style="${confirmInfoAmount}">{{amountTo}} {{to.ticker}}</span>
+                <span style="${confirmInfoAmount}">≈ {{amountTo}} {{to.ticker}}</span>
                 <span style="${confirmInfoSub}">{{recipientWallet}}</span>
               </div>
             </div>
@@ -487,16 +480,20 @@ module.exports = {
             </div>
           </div>
           <div style="${confirmCheckboxWrapper}">
-            <label style="${checkboxBody}">
+            <label style="${checkboxBody}" class="cursor-pointer">
               <input type="checkbox" v-model="confirm" style="${checkbox}">
               <span v-if="confirm" style="${checkboxChecked}"><font-awesome-icon  :icon="faCheck" size="lg"/></span>
             </label>
             <div style="confirmText">
-              <span>I've read and agree to the ChangeNOW Terms of Use and Privacy Policy</span>
+              <span>I've read and agree to the ChangeNOW 
+                <a class="no-underline"  style="color: #3bee81;" href="https://changenow.io/terms-of-use" target="blank">Terms of Use</a> and 
+                <a class="no-underline" style="color: #3bee81;"  href="https://changenow.io/privacy-policy" target="blank">Privacy Policy</a>
+              </span>
             </div>
           </div>
           <div style="${buttonsBlock}">
-            <button style="${stepButton} ${disabledButton}">Next</button>
+            <button v-if="!confirm" style="${stepButton} ${disabledButton}" :disabled="!confirm">Confirm</button>
+            <button v-else style="${stepButton} ${buttonGreen}" >Confirm</button>
             <button style="${stepButton} ${buttonWhite}" @click.prevent="switchToOneStep">Back</button>
           </div>
         </div>
