@@ -204,6 +204,7 @@ module.exports = {
     async getFromCurrencies () {
       try {
         this.currencies = await this.api.getAllCurrencies();
+        console.log(this.currencies.find(c => c.ticker === 'ark'));
         if (this.from) {
           return;
         }

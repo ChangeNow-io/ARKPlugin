@@ -4,7 +4,7 @@ const mainContainer = `
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #2b2b37 url(./logo.svg) 50% no-repeat;
+  background: #2b2b37 url(../img/worldmap.svg) 50% no-repeat;
 `;
 
 const mainHeader = `
