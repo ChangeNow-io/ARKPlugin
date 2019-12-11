@@ -1,10 +1,29 @@
 const colorGreen = '#3bee81';
 
+const pluginContainer = `
+  background: #2B2B37 radial-gradient(ellipse 210px 210px at 100% 40%, rgba(110, 14, 125, 0.2), #2B2B37);
+  position: relative;
+`;
+const formContainer = `
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:  radial-gradient(ellipse 390px 390px at 0% 40%, rgba(109, 107, 217, 0.3), #2B2B37, transparent);
+`;
+
 const mainContainer = `
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #2b2b37 url(../img/worldmap.svg) 50% no-repeat;
+  position: relative;
+`;
+
+const mainPageHeader = `
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-left: 25px;
 `;
 
 const mainHeader = `
@@ -20,6 +39,7 @@ const subTitle = `
 
 const mainBlock = `
   padding: 20xp;
+  z-index: 100;
 `
 
 const block = `
@@ -108,7 +128,9 @@ const sequenceBlock = `
   padding-left: 50px;
   position: relative;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  padding-right: 30px
 `;
 
 const circle = `
@@ -261,5 +283,8 @@ module.exports = {
   coinName,
   inputLoader,
   sreachIcon,
-  subName
+  subName,
+  mainPageHeader,
+  pluginContainer,
+  formContainer
 }

@@ -23,6 +23,7 @@ const Stepper = `
 const stepContainer = `
   width: 100%;
   max-width: 960px;
+  margin: 0 auto;
   background-color: white;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 8px;
   height: auto;
@@ -277,7 +278,7 @@ const refundButton = `
 const inputError = `
   position: absolute;
   left: 20px;
-  top: 100%;  
+  top: 105%;  
   color: #dc1d2e;
   font-size: 14px;
 `
@@ -307,6 +308,11 @@ const infoContent = `
   line-height: 1;
   letter-spacing: .5px;
   word-break: break-all;
+`;
+
+const bigLoader = `
+  font-size: 50px;
+  margin: 20px 0;
 `;
 
 module.exports = {
@@ -350,5 +356,6 @@ module.exports = {
 	exchangeInputError,
 	stepThreeBlock,
 	infoHeader,
-	infoContent
+  infoContent,
+  bigLoader
 };
