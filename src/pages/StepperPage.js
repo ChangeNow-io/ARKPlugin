@@ -536,7 +536,7 @@ module.exports = {
         const isValidRecipient = this.recipientWallet && valiateAddress(this.to.ticker, this.recipientWallet);
         const isValidRefund = this.fullFrom && this.fullFrom.isAnonymous || this.refundWallet ? 
           valiateAddress(this.from.ticker, this.refundWallet) : true;
-        const isValidExternalId = this.fullTo && !this.fullTo.hasExternalId || this.externalId && valiateExternalId(this.to.ticker, this.externalId);
+        const isValidExternalId = this.fullTo && !this.fullTo.hasExternalId || this.externalId ? valiateExternalId(this.to.ticker, this.externalId) : true;
         return Boolean(isValidRecipient && isValidRefund && isValidExternalId && !this.hasError && !this.amountError);
       }
       return false
