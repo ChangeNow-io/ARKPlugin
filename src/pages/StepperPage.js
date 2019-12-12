@@ -119,7 +119,7 @@ module.exports = {
                   <div style="${sreachIcon}"><font-awesome-icon :icon="faSearch" size="lg"/></div>
                   <input type="text" style="${searchInput}" ref="searchFrom" v-model="fromFilter">
                   <div style="${currencyListContainer}">
-                    <ul style="${currencyList}">
+                    <ul v-if="isListFromOpen" style="${currencyList}">
                       <li v-for="fromCurrency in filtredFrom" style="${currencyItem}" v-bind:key="fromCurrency.ticker"
                         class="hover:shadow-md" @click="() => selectCoinFrom(fromCurrency.ticker)">
                         <img :src="fromCurrency.image" style="${coinIcon}"> 
@@ -183,7 +183,7 @@ module.exports = {
                   <div style="${sreachIcon}"><font-awesome-icon :icon="faSearch" size="lg"/></div>
                   <input type="text" style="${searchInput}" ref="searchTo" v-model="toFilter">
                   <div style="${currencyListContainer}">
-                    <ul style="${currencyList}">
+                    <ul v-if="isListToOpen" style="${currencyList}">
                       <li v-for="toCurrency in filtredTo" style="${currencyItem}" v-bind:key="toCurrency.ticker"
                         class="hover:shadow-md" @click="() => selectCoinTo(toCurrency.ticker)">
                         <img :src="toCurrency.image" style="${coinIcon}"> 
@@ -450,6 +450,8 @@ module.exports = {
       recipientFocus: false,
       refundFocus: false,
       externalIdFocus: false,
+      isListFromOpen: false,
+      isListToOpen: false,
 
       hasError: false,
       amountError: false,
@@ -575,11 +577,13 @@ module.exports = {
       if (!domElements.includes(cfl) && !domElements.includes(this.refs.fromSearchBtn)) {
         cfl.style.display = 'none';
         this.fromFilter = '';
+        this.isListFromOpen = false;
       }
       if (!event.path.includes(ctl) && !domElements.includes(this.refs.toSearchBtn)) {
         ctl.style.display = 'none';
         this.toFilter = '';
-      }      
+        this.isListToOpen = false;
+      }    
     },
     countSequence () {
       const price = this.amountTo && this.amount ? Number(this.amountTo / this.amount).toFixed(7) : 0;
@@ -671,12 +675,14 @@ module.exports = {
       if (this.currencies.length) {
         this.refs.currencySelectFrom.style.display = 'block';
         this.refs.searchFrom.focus();
+        this.isListFromOpen = true;
       }
     },
     openSelectTo () {
       if (this.currencies.length) {
         this.refs.currencySelectTo.style.display = 'block';
         this.refs.searchTo.focus();
+        this.isListToOpen = true;
       }
     },  
     selectCoinFrom (ticker) {
@@ -687,6 +693,7 @@ module.exports = {
       }
       this.recountTo();
       this.refs.currencySelectFrom.style.display = 'none';
+      this.isListFromOpen = false;
       this.fromFilter = '';
     },
     selectCoinTo (ticker) {
@@ -697,6 +704,7 @@ module.exports = {
       }
       this.recountTo();
       this.refs.currencySelectTo.style.display = 'none';
+      this.isListToOpen = false;
       this.toFilter = '';
     },
     isNumber (event) {
