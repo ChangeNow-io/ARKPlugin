@@ -297,8 +297,8 @@ module.exports = {
                 <span style="${confirmInfoSub}">{{recipientWallet}}</span>
               </div>
             </div>
-            <div style="margin: 20px 0;">
-              <p style="${confirmInfoLabel} margin-bottom: 5px;">Estimated Arrival</p>
+            <div style="margin: 10px 0;">
+              <p style="${confirmInfoLabel} margin-bottom: 3px;">Estimated Arrival</p>
               <p style="${confirmInfoSub}">≈ {{transactionTime}} minutes</p>
             </div>
           </div>
@@ -330,8 +330,8 @@ module.exports = {
             <span class="m-4" style="color: #a4a3aa; font-size: 16px;">Transaction Id: {{transaction.id}}</span>
             <button style="margin-left: auto; color: #3bee81;" @click="startNewTransaction">Start new transaction</button>
           </div>
-          <div style="${stepBody}">
-            <div style="border: 2px solid #3bee81; padding: 5px 65px 5px 10px; max-width: 650px;" class="mb-4">
+          <div style="padding: 5px 0;">
+            <div style="border: 2px solid #3bee81; padding: 5px 65px 5px 10px; max-width: 650px;" class="mb-1">
               <div style="${stepThreeBlock}">
                 <p style="${infoHeader}">You send</p>
                 <p style="${infoContent} text-transform:uppercase;">{{transaction.expectedSendAmount}} {{transaction.fromCurrency}}</p>
@@ -345,7 +345,7 @@ module.exports = {
                 <p style="${infoContent}">{{transaction.payinExtraId}} <ButtonClipboard :value="transaction.payinExtraId" class="text-theme-page-text-light mx-2"/></p>
               </div>
             </div>
-            <div style="padding: 5px 65px 5px 10px;" class="mb-4">
+            <div style="padding: 5px 65px 5px 10px;">
               <div style="${stepThreeBlock}">
                 <p style="${infoHeader}">You get</p>
                 <p style="${infoHeader} font-size: 18px; text-transform:uppercase;"> ≈ {{transaction.expectedReceiveAmount}} {{transaction.toCurrency}}</p>
@@ -383,20 +383,24 @@ module.exports = {
             <div v-if="transaction.status === statuses.finished" style="padding: 5px 65px 5px 10px;" class="mb-1">
               <div style="${stepThreeBlock}">
                 <p style="${infoHeader} font-weight: 600;">Input Transaction Hash</p>
-                <p style="${infoHeader} font-size: 18px; word-break: break-all;">{{transaction.payinHash}}</p>
+                <p style="${infoHeader} font-size: 16px; word-break: break-all;">
+                  <a style="color: #3bee81;"  target="_blank" :href="payinHashLink">{{transaction.payinHash}}</a>
+                </p>
               </div>
               <div style="${stepThreeBlock}">
                 <p style="${infoHeader} font-weight: 600;">Output Transaction Hash</p>
-                <p style="${infoHeader} font-size: 18px;  word-break: break-all;">{{transaction.payoutHash}}</p>
+                <p style="${infoHeader} font-size: 16px;  word-break: break-all;">
+                  <a style="color: #3bee81;" target="_blank" :href="payoutHashLink">{{transaction.payoutHash}}</a>
+                </p>
               </div>
             </div>
-            <div v-if="transaction.status === statuses.finished" class="px-4 py-3 my-1 flex items-center justify-center">
+            <div v-if="transaction.status === statuses.finished" class="px-2 py-1 flex items-center justify-center">
               <p style="width: 150px; color: #333; text-align: center;">Write about your experience on</p>
               <a href="https://www.trustpilot.com/review/changenow.io" target="_blank">
                 <div style="width: 100px;">${trustPilotIcon()}</div>
               </a>  
             </div>
-            <div class="px-4 py-3 rounded my-1" style="background-color: rgba(61,61,112,.04);">
+            <div class="px-2 py-1 rounded my-1" style="background-color: rgba(61,61,112,.04);">
               <p class="mb-1" style="color: #333;">If you have any questions about your exchange, please contact our support team via email.</p>
               <a style="color: #3bee81;" href="mailto: support@changenow.io">support@changenow.io</a>
           </div>
@@ -564,6 +568,16 @@ module.exports = {
         return this.finishedStatuses.includes(status);
       } 
       return false;
+    },
+    payinHashLink () {
+      if (this.transaction && this.transaction.status === statuses.finished) {
+        return this.fullTo ? this.fullTo.transactionExplorerMask.replace('$$', this.transaction.payinHash) :  '';
+      } return '';
+    },
+    payoutHashLink () {
+      if (this.transaction && this.transaction.status === statuses.finished) {
+        return this.fullFrom ? this.fullFrom.transactionExplorerMask.replace('$$', this.transaction.payoutHash) :  '';
+      } return '';
     }
   },
   methods: {
@@ -752,14 +766,21 @@ module.exports = {
         return;
       }
       const { id } = this.transaction;
-      const transactionData = await this.api.getTransactionStatus(id);
-      transactionData.id = '2d1cc415685d1e';
-      this.counter++
-
-      this.transaction = transactionData;
-      if (finishedStatuses.includes(transactionData.status)) {
-        walletApi.storage.set('transactionId', null);
-        walletApi.timers.clearInterval(this.statusTimer);
+      try {
+        const transactionData = await this.api.getTransactionStatus(id);
+        if (!this.fullTo || !this.fullFrom) {
+          const [ from, to ] = await Promise.all([this.api.getCurrencyInfo(transactionData.fromCurrency), this.api.getCurrencyInfo(transactionData.toCurrency)]);
+          this.fullFrom = from;
+          this.fullTo = to;
+        }
+  
+        this.transaction = transactionData;
+        if (finishedStatuses.includes(transactionData.status)) {
+          walletApi.storage.set('transactionId', null);
+          walletApi.timers.clearInterval(this.statusTimer);
+        }
+      } catch (error) {
+          walletApi.alert.error(`Faled to fetch transaction data.`);
       }
     },
     async initialize () {
@@ -768,18 +789,6 @@ module.exports = {
       const storageAmount = walletApi.storage.get('amount');
       const storageTo = walletApi.storage.get('toCurrency');
       const lastId = walletApi.storage.get('transactionId'); 
-      if (lastId) {
-        this.statusTimer = walletApi.timers.setInterval(() => {
-          this.checkTransactionStatus();
-        }, exchangeInterval);
-        this.transaction = {
-          id: lastId
-        };
-        await this.checkTransactionStatus();
-        this.currentStep = 3;
-        this.initializing = false;
-        return;
-      }
       const profile = walletApi.profiles.getCurrent();
       this.arkWallets = profile.wallets.map(wallet => {
         return wallet.name ? wallet.name : wallet.address;
@@ -797,6 +806,18 @@ module.exports = {
         this.setArkAddress();
       }
       try {
+        if (lastId) {
+          this.statusTimer = walletApi.timers.setInterval(() => {
+            this.checkTransactionStatus();
+          }, exchangeInterval);
+          this.transaction = {
+            id: lastId
+          };
+          await this.checkTransactionStatus();
+          this.currentStep = 3;
+          this.initializing = false;
+          return;
+        }
         await this.getFromCurrencies();
         this.getToCurrencies();
         await this.recountTo();

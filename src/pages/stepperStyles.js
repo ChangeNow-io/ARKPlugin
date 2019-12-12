@@ -292,7 +292,7 @@ const exchangeInputError = `
 `;
 
 const stepThreeBlock = `
-  margin-bottom: 8px;
+  margin-bottom: 0;
 `;
 
 const infoHeader = `
