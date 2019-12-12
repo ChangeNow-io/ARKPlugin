@@ -88,12 +88,11 @@ const {
 
 module.exports = {
   template: `
-    <div class="rounded-lg p-3 " style="${mainContainer}">
+    <div class="rounded-lg p-3 " style="${mainContainer}" @click="outSideClick">
       <div v-if="initializing">
         <Loader />
       </div>
       <div v-else style="${Stepper}">
-        <div v-if="selectFromOpen || selectToOpen" style="${selectFromWrapper}" @click="closeSelect"></div>
         <div v-if="currentStep === 1" style="${stepContainer}">
           <div style="${stepHeader}">
             <div style="${stepNumber}">1</div>
@@ -105,7 +104,7 @@ module.exports = {
                 <div v-if="amountError" style="${exchangeInputError}">{{renderFromLabel}}</div>
                 <div v-else style="${exchangeInputTitle}">You send</div>
                 <input type="text" v-model.number="amount" @keyup="startRecount" style="${input}" @input="isNumber($event)"/>
-                <div class="cursor-pointer" style="${exchangeInputSearch}" @click="openSelectFrom">
+                <div class="cursor-pointer" style="${exchangeInputSearch}" ref="fromSearchBtn" @click="openSelectFrom">
                   <img v-if="from" :src="from.image" style="${coinIcon}"> 
                   <span v-if="from && isLongFromName">
                     {{longName[from.ticker].ticker}}<sup style="${subName}">{{longName[from.ticker].sub}}</sup>
@@ -116,7 +115,7 @@ module.exports = {
                   <div class="currencies-container currencies-to-container"></div>
                   <div style="${arrow}"></div>
                 </div>
-                <div v-if="selectFromOpen" style="${selectContainer}">
+                <div style="${selectContainer} display: none;" ref="currencySelectFrom">
                   <div style="${sreachIcon}"><font-awesome-icon :icon="faSearch" size="lg"/></div>
                   <input type="text" style="${searchInput}" ref="searchFrom" v-model="fromFilter">
                   <div style="${currencyListContainer}">
@@ -169,7 +168,7 @@ module.exports = {
                 <span v-if="isCounting" style="${inputLoader}">
                   <font-awesome-icon :icon="spinner" size="lg" rotation="180" spin/>
                 </span>
-                <div class="cursor-pointer" style="${exchangeInputSearch}" @click="openSelectTo">
+                <div class="cursor-pointer" style="${exchangeInputSearch}" ref="toSearchBtn" @click="openSelectTo">
                   <img v-if="to" :src="to.image" style="${coinIcon}">
                   <span v-if="to && isLongToName">
                     {{longName[to.ticker].ticker}}<sup style="${subName}">{{longName[to.ticker].sub}}</sup>
@@ -180,7 +179,7 @@ module.exports = {
                   <div class="currencies-container currencies-to-container"></div>
                   <div style="${arrow}"></div>
                 </div>
-                <div v-if="selectToOpen" style="${selectContainer}">
+                <div style="${selectContainer} display: none;" ref="currencySelectTo">
                   <div style="${sreachIcon}"><font-awesome-icon :icon="faSearch" size="lg"/></div>
                   <input type="text" style="${searchInput}" ref="searchTo" v-model="toFilter">
                   <div style="${currencyListContainer}">
@@ -436,8 +435,6 @@ module.exports = {
       fullFrom: null,
       api: {},
       isCounting: false,
-      selectFromOpen: false,
-      selectToOpen: false,
       recountTimer: null,
       counter: 1,
       recountTimeout: null,
@@ -568,6 +565,22 @@ module.exports = {
     }
   },
   methods: {
+    outSideClick (event) {
+      const domElements = event.path;
+      const cfl = this.refs.currencySelectFrom;
+      const ctl = this.refs.currencySelectTo;
+      if (!cfl || !ctl) {
+        return;
+      }
+      if (!domElements.includes(cfl) && !domElements.includes(this.refs.fromSearchBtn)) {
+        cfl.style.display = 'none';
+        this.fromFilter = '';
+      }
+      if (!event.path.includes(ctl) && !domElements.includes(this.refs.toSearchBtn)) {
+        ctl.style.display = 'none';
+        this.toFilter = '';
+      }      
+    },
     countSequence () {
       const price = this.amountTo && this.amount ? Number(this.amountTo / this.amount).toFixed(7) : 0;
       return `1 ${this.from ? this.from.ticker.toUpperCase() : defaultFrom.toUpperCase() } ≈ ${price || ''} ${this.to ? this.to.ticker.toUpperCase() : 'ETH'}`
@@ -656,38 +669,35 @@ module.exports = {
     },
     openSelectFrom () {
       if (this.currencies.length) {
-        this.selectFromOpen = true;
-        // this.$refs.searchFrom.$el.focus();
+        this.refs.currencySelectFrom.style.display = 'block';
+        this.refs.searchFrom.focus();
       }
     },
     openSelectTo () {
       if (this.currencies.length) {
-        this.selectToOpen = true;
-        // this.$refs.searchTo.$el.focus();
+        this.refs.currencySelectTo.style.display = 'block';
+        this.refs.searchTo.focus();
       }
-    },
-    closeSelect () {
-      this.toFilter = '';
-      this.fromFilter = '';
-      this.selectFromOpen = false;
-      this.selectToOpen = false;
-    },
+    },  
     selectCoinFrom (ticker) {
       const newFrom = this.currencies.find(currency => currency.ticker === ticker);
       if (newFrom) {
         this.from = newFrom;
+        walletApi.storage.set('fromCurrency', newFrom);
       }
       this.recountTo();
-      this.closeSelect();
+      this.refs.currencySelectFrom.style.display = 'none';
+      this.fromFilter = '';
     },
     selectCoinTo (ticker) {
       const newTo = this.currencies.find(currency => currency.ticker === ticker);
       if (newTo) {
         this.to = newTo;
-        this.externalId = '';
+        walletApi.storage.set('toCurrency', newTo);
       }
       this.recountTo();
-      this.closeSelect();
+      this.refs.currencySelectTo.style.display = 'none';
+      this.toFilter = '';
     },
     isNumber (event) {
       const value = event.target.value.trim();

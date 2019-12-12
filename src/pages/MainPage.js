@@ -1,5 +1,6 @@
 const ApiWorker = require('../apiWorker');
 const style = require('./mainPageStyles');
+const renderMapImage = require('../components/renderMap');
 const { longName } = require('../constants');
 const { defaultFrom, defaultTo, defaultAmount } = require('../config.json');
 
@@ -44,7 +45,7 @@ const { faArrowsAltV, faSpinner, faLongArrowAltDown, faLongArrowAltUp, faSearch,
 
 module.exports = {
   template: `
-    <div class="rounded-lg px-0 py-2 flex flex-col" style="${pluginContainer}">
+    <div class="rounded-lg px-0 py-2 flex flex-col" style="${pluginContainer}" @click="outSideClick">
       <div style="${mainPageHeader}">
       <svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
         <g id="ChangeNOW-logo-transparent">
@@ -58,7 +59,7 @@ module.exports = {
         <div class="sm:block hidden" style="color: #3D3D70; font-size: 16px;">Cryptocurrency Exchange</div>
       </div>
       <div style="${formContainer}" class="px-3">
-        <div v-if="selectFromOpen || selectToOpen" style="${selectFromWrapper}" @click="closeSelect"></div>
+          ${renderMapImage()}
         <div v-if="initializing">
           <Loader />
         </div>
@@ -72,7 +73,7 @@ module.exports = {
             <div style="${inputWrapper}">
               <div style="${exchangeInputTitle}">You send</div>
               <input type="text" v-model.number="amount" @keyup="startRecount" style="${input}" @input="isNumber($event)"/>
-              <div class="cursor-pointer" style="${exchangeInputSearch}" @click="openSelectFrom">
+              <div class="cursor-pointer" style="${exchangeInputSearch}" ref="fromSearchBtn" @click="openSelectFrom">
                 <img v-if="from" :src="from.image" style="${coinIcon}"> 
                 <span v-if="from && isLongFromName">
                   {{longName[from.ticker].ticker}}<sup style="${subName}">{{longName[from.ticker].sub}}</sup>
@@ -83,14 +84,15 @@ module.exports = {
                 <div class="currencies-container currencies-to-container"></div>
                 <div style="${arrow}"></div>
               </div>
-              <div v-if="selectFromOpen" style="${selectContainer}">
+              <div style="${selectContainer} display: none;" ref="currencySelectFrom">
                 <div style="${sreachIcon}"><font-awesome-icon :icon="faSearch" size="lg"/></div>
                 
                 <input type="text" style="${searchInput}" ref="searchFrom" v-model="fromFilter">
                 <div style="${currencyListContainer}">
                   <ul style="${currencyList}">
                     <li v-for="fromCurrency in filtredFrom" style="${currencyItem}" v-bind:key="fromCurrency.ticker"
-                      class="hover:shadow-md" @click="() => selectCoinFrom(fromCurrency.ticker)">
+                      class="hover:shadow-md" @click="() => selectCoinFrom(fromCurrency.ticker)"
+                      >
                       <img :src="fromCurrency.image" style="${coinIcon}"> 
                       <span style="${coinTicker}">{{fromCurrency.ticker}}</span>
                       <span style="${coinName}">{{fromCurrency.name}}</span>
@@ -115,7 +117,7 @@ module.exports = {
                       ChangeNOW will pick the best rate for you during the moment of the exchange.
                     </p>
                     <a href="https://changenow.io/faq/what-is-the-expected-exchange-rate" 
-                      style="color: #3bee81; font-size: 12px;" target="_blank">
+                      style="color: #3bee81; font-size: 12px;" target="_blank" rel="noopener">
                         <div class="flex items-center">
                           Learn More
                           <div style="font-size: 6px; margin-left: 3px; padding-bottom: 2px;">
@@ -137,7 +139,7 @@ module.exports = {
               <span v-if="isCounting" style="${inputLoader}">
                 <font-awesome-icon :icon="spinner" size="lg" rotation="180" spin/>
               </span>
-              <div class="cursor-pointer" style="${exchangeInputSearch}" @click="openSelectTo">
+              <div class="cursor-pointer" style="${exchangeInputSearch}" ref="toSearchBtn" @click="openSelectTo">
                 <img v-if="to" :src="to.image" style="${coinIcon}">
                 <span v-if="to && isLongToName">
                 {{longName[to.ticker].ticker}}<sup style="${subName}">{{longName[to.ticker].sub}}</sup>
@@ -148,7 +150,7 @@ module.exports = {
                 <div class="currencies-container currencies-to-container"></div>
                 <div style="${arrow}"></div>
               </div>
-              <div v-if="selectToOpen" style="${selectContainer}">
+              <div style="${selectContainer} display: none;" ref="currencySelectTo">
               <div style="${sreachIcon}"><font-awesome-icon :icon="faSearch" size="lg"/></div>
               <input type="text" style="${searchInput}" ref="searchTo" v-model="toFilter">
               <div style="${currencyListContainer}">
@@ -191,8 +193,6 @@ module.exports = {
       to: null,
       api: {},
       isCounting: false,
-      selectFromOpen: false,
-      selectToOpen: false,
       recountTimer: null,
       recountTimeout: null,
       initializing: true,
@@ -237,6 +237,22 @@ module.exports = {
   },
 
   methods: {
+    outSideClick (event) {
+      const domElements = event.path;
+      const cfl = this.refs.currencySelectFrom;
+      const ctl = this.refs.currencySelectTo;
+      if (!cfl || !ctl) {
+        return;
+      }
+      if (!domElements.includes(cfl) && !domElements.includes(this.refs.fromSearchBtn)) {
+        cfl.style.display = 'none';
+        this.fromFilter = '';
+      }
+      if (!event.path.includes(ctl) && !domElements.includes(this.refs.toSearchBtn)) {
+        ctl.style.display = 'none';
+        this.toFilter = '';
+      }      
+    },
     countSequence () {
       const price = this.amountTo && this.amountTo !== '-' && this.amount ? Number(this.amountTo / this.amount).toFixed(7) : 0;
       return `1 ${this.from ? this.from.ticker.toUpperCase() : defaultFrom.toUpperCase() } ≈ ${price || ''} ${this.to ? this.to.ticker.toUpperCase() : 'ETH'}`
@@ -296,22 +312,16 @@ module.exports = {
     },
     openSelectFrom () {
       if (this.currencies.length) {
-        this.selectFromOpen = true;
-        // this.$refs.searchFrom.$el.focus();
+        this.refs.currencySelectFrom.style.display = 'block';
+        this.refs.searchFrom.focus();
       }
     },
     openSelectTo () {
       if (this.currencies.length) {
-        this.selectToOpen = true;
-        // this.$refs.searchTo.$el.focus();
+        this.refs.currencySelectTo.style.display = 'block';
+        this.refs.searchTo.focus();
       }
-    },
-    closeSelect () {
-      this.toFilter = '';
-      this.fromFilter = '';
-      this.selectFromOpen = false;
-      this.selectToOpen = false;
-    },
+    },  
     selectCoinFrom (ticker) {
       const newFrom = this.currencies.find(currency => currency.ticker === ticker);
       if (newFrom) {
@@ -319,7 +329,8 @@ module.exports = {
         walletApi.storage.set('fromCurrency', newFrom);
       }
       this.recountTo();
-      this.closeSelect();
+      this.refs.currencySelectFrom.style.display = 'none';
+      this.fromFilter = '';
     },
     selectCoinTo (ticker) {
       const newTo = this.currencies.find(currency => currency.ticker === ticker);
@@ -328,7 +339,8 @@ module.exports = {
         walletApi.storage.set('toCurrency', newTo);
       }
       this.recountTo();
-      this.closeSelect();
+      this.refs.currencySelectTo.style.display = 'none';
+      this.toFilter = '';
     },
     isNumber (event) {
       const value = event.target.value.trim();
