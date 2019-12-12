@@ -467,7 +467,8 @@ module.exports = {
       statusTimer: null,
       finishedStatuses,
       statuses,
-      counter: 0
+      counter: 0,
+      sequence: ''
     }
   },
 
@@ -508,10 +509,6 @@ module.exports = {
     },
     toTicker ()  {
       return this.to ? this.to.ticker.toUpperCase(): defaultTo;
-    },
-    sequence () {
-      const price = this.amountTo && this.amount ? Number(this.amountTo / this.amount).toFixed(7) : 0;
-      return `1 ${this.from ? this.from.ticker.toUpperCase() : defaultFrom.toUpperCase() } ≈ ${price || ''} ${this.to ? this.to.ticker.toUpperCase() : 'ETH'}`
     },
     filtredFrom () {
       const filter = this.fromFilter.toLowerCase().trim();
@@ -571,6 +568,10 @@ module.exports = {
     }
   },
   methods: {
+    countSequence () {
+      const price = this.amountTo && this.amount ? Number(this.amountTo / this.amount).toFixed(7) : 0;
+      return `1 ${this.from ? this.from.ticker.toUpperCase() : defaultFrom.toUpperCase() } ≈ ${price || ''} ${this.to ? this.to.ticker.toUpperCase() : 'ETH'}`
+    },
     toggleRefund () {
       this.needRefund = !this.needRefund;
       this.refundWallet = '';
@@ -633,6 +634,7 @@ module.exports = {
           }
           walletApi.alert.error('Unknown error.');
         } finally {
+          this.sequence = this.countSequence();
           this.isCounting = false;
         }
       }

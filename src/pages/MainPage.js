@@ -198,7 +198,8 @@ module.exports = {
       initializing: true,
       fromFilter: '',
       toFilter: '',
-      longName: {}
+      longName: {},
+      sequence: ''
     }
   },
 
@@ -214,10 +215,6 @@ module.exports = {
     },
     toTicker ()  {
       return this.to ? this.to.ticker.toUpperCase(): defaultTo;
-    },
-    sequence () {
-      const price = this.amountTo && this.amount ? Number(this.amountTo / this.amount).toFixed(7) : 0;
-      return `1 ${this.from ? this.from.ticker.toUpperCase() : defaultFrom.toUpperCase() } ≈ ${price || ''} ${this.to ? this.to.ticker.toUpperCase() : 'ETH'}`
     },
     filtredFrom () {
       const filter = this.fromFilter.toLowerCase().trim();
@@ -240,6 +237,10 @@ module.exports = {
   },
 
   methods: {
+    countSequence () {
+      const price = this.amountTo && this.amountTo !== '-' && this.amount ? Number(this.amountTo / this.amount).toFixed(7) : 0;
+      return `1 ${this.from ? this.from.ticker.toUpperCase() : defaultFrom.toUpperCase() } ≈ ${price || ''} ${this.to ? this.to.ticker.toUpperCase() : 'ETH'}`
+    },
     async getFromCurrencies () {
       try {
         this.currencies = await this.api.getAllCurrencies();
@@ -269,8 +270,9 @@ module.exports = {
           const { estimatedAmount, transactionSpeedForecast } = await this.api.exchangeAmount(fromTo, amount);
           this.amountTo = estimatedAmount;
         } catch (error) {
-          this.amountTo = 0;
+          this.amountTo = '-';
         } finally {
+          this.sequence = this.countSequence();
           this.isCounting = false;
         }
       }
