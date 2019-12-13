@@ -241,6 +241,7 @@ module.exports = {
   methods: {
     outSideClick (event) {
       const domElements = event.path;
+      console.log(this);
       const cfl = this.refs.currencySelectFrom;
       const ctl = this.refs.currencySelectTo;
       if (!cfl || !ctl) {

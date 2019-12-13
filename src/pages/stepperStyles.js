@@ -27,13 +27,13 @@ const stepContainer = `
   background-color: white;
   box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 8px;
   height: auto;
-  padding: 10px 30px;
+  padding: 18px 30px;
 `;
 
 const stepHeader = `
   width: 100%;
   height: 40px;
-  padding: 10px 0;
+  padding-bottom: 10px;
   display: flex;
   align-items: center;
 `;
@@ -224,8 +224,6 @@ const confirmInfoAmount = `
   color: #2b2b37;
   text-transform: uppercase;
   letter-spacing: .5px;
-  white-space: nowrap;
-  word-break: break-all;
 `;
 
 const confirmInfoSub = `
@@ -315,6 +313,94 @@ const bigLoader = `
   margin: 20px 0;
 `;
 
+const smallStep = `
+  background-color: #fff;
+  padding: 10px 20px;
+  margin: 10px 0;
+  box-shadow: 0 4px 8px rgba(0,0,0,.1);
+`
+
+const smallStepHeader = `
+  display: flex;
+  margin-bottom: 15px;
+  -webkit-box-align: center;
+  align-items: center;
+`;
+
+const smallStepNumber = `
+  width: 40px;
+  height: 40px;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background-color: #3bee81;
+  color: #fff;
+  font-size: 20px;
+  text-align: center;
+  line-height: 40px;
+  margin-right: 17px;
+`;
+
+const smallStepName = `
+  font-size: 24px;
+  font-weight: 700;
+  color: #2b2b37;
+  letter-spacing: .4px;
+  text-align: left;
+  margin-right: 30px;
+`;
+
+const stepHeaderText = `
+  font-weight: 400;
+  font-size: 15px;
+  color: #a4a3aa;
+  letter-spacing: .3px;
+  line-height: 30px;
+`;
+
+
+const smallStepInfoIcon = `
+  width: 96px;
+  height: 96px;
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  align-items: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: rgba(61,61,112,.04);
+`
+
+const smallStepInfoItem = `
+  width: 100%;
+  padding-right: 20px;
+  margin-bottom: 10px;
+  display: -webkit-box;
+  display: flex;
+`;
+
+const stepInfoHead = `
+  line-height: 1.3;
+  font-size: 15px;
+  letter-spacing: .3px;
+  flex-shrink: 0;
+`;
+
+const transactionSuccessIcon = `
+  background-color: #3bee81;
+  width: 48px;
+  height: 48px;
+  margin: auto auto 15px;
+  border-radius: 50%;
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  align-items: center;
+`;
+
 module.exports = {
 	mainContainer,
 	arrow,
@@ -357,5 +443,14 @@ module.exports = {
 	stepThreeBlock,
 	infoHeader,
   infoContent,
-  bigLoader
+  bigLoader,
+  smallStep,
+  smallStepHeader,
+  smallStepNumber,
+  smallStepName,
+  stepHeaderText,
+  smallStepInfoIcon,
+  smallStepInfoItem,
+  stepInfoHead,
+  transactionSuccessIcon
 };

@@ -69,8 +69,27 @@ const {
 	stepThreeBlock,
 	infoHeader,
   infoContent,
-  bigLoader
+  bigLoader,
+  smallStep,
+  smallStepHeader,
+  smallStepNumber,
+  smallStepName,
+  stepHeaderText,
+  smallStepInfoIcon,
+  smallStepInfoItem,
+  stepInfoHead,
+  transactionSuccessIcon
+  
 } = stepperStyle;
+
+
+const trustPilot = `            
+<div v-if="transaction.status === statuses.finished" class="px-2 py-1 flex items-center justify-center">
+  <p style="width: 150px; color: #333; text-align: center;">Write about your experience on</p>
+  <a href="https://www.trustpilot.com/review/changenow.io" target="_blank">
+    <div style="width: 100px;">${trustPilotIcon()}</div>
+  </a>  
+</div>`;
 
 const { 
   faArrowsAltV, 
@@ -297,9 +316,15 @@ module.exports = {
                 <span style="${confirmInfoSub}">{{recipientWallet}}</span>
               </div>
             </div>
-            <div style="margin: 10px 0;">
-              <p style="${confirmInfoLabel} margin-bottom: 3px;">Estimated Arrival</p>
-              <p style="${confirmInfoSub}">≈ {{transactionTime}} minutes</p>
+            <div style="margin: 10px 0;" class="flex">
+              <div style="margin-right: 30px;">
+                <p style="${confirmInfoLabel} margin-bottom: 3px;">Estimated Arrival</p>
+                <p style="${confirmInfoSub}">≈ {{transactionTime}} minutes</p>
+              </div>
+              <div v-if="fullTo.hasExternalId && externalId">
+                <p style="${confirmInfoLabel} margin-bottom: 3px;">{{fullTo.externalIdName ? fullTo.externalIdName : 'Extra Id'}}</p>
+                <p style="${confirmInfoSub}">{{externalId}}</p>
+              </div>
             </div>
           </div>
           <div style="${confirmCheckboxWrapper}">
@@ -354,57 +379,125 @@ module.exports = {
                 <p style="${infoHeader}">To address</p>
                 <p style="${infoHeader} font-size: 18px; word-break: break-all;">{{transaction.payoutAddress}}</p>
               </div>
+              <div v-if="transaction.payoutExtraId" style="${stepThreeBlock}">
+                <p style="${infoHeader}">{{transaction.payoutExtraIdName}}</p>
+                <p style="${infoHeader} font-size: 18px; word-break: break-all;">{{transaction.payoutExtraId}}</p>
+              </div>
             </div>
             <div v-if="!isExchangeFinished" style="exchangeStatuses" class="flex items-center justify-center flex-col md:flex-row">
               <div style="height: 35px; border: 2px solid rgba(61,61,112,.04);" class="md:w-1/3 w-full mb-1 md:mx-1  flex items-center justify-center">
                 <font-awesome-icon v-if="confirmingStatus" :icon="faCheckCircle" size="lg" style="color: #3bee81;"/>
                 <font-awesome-icon v-else :icon="spinner" size="lg" rotation="180" spin style="color: #3bee81;"/>
-                <span class="ml-2">Awaiting deposit</span>
+                <span class="ml-2">{{confirmingStatus ? 'Deposite received' : 'Awaiting deposit'}}</span>
               </div>
               <div style="height: 35px; border: 2px solid rgba(61,61,112,.04);" class="md:w-1/3 w-full mb-1 md:mx-1  flex items-center justify-center">
                 <font-awesome-icon v-if="exchangingStatus" :icon="faCheckCircle" size="lg" style="color: #3bee81;"/>
                 <font-awesome-icon v-else-if="confirmingStatus" :icon="spinner" size="lg" rotation="180" spin style="color: #3bee81;"/>
                 <font-awesome-icon v-else :icon="faCircleNotch" size="lg" style="color: #E9E7EF;"/>
-                <span class="ml-2">Exchanging</span>
+                <span class="ml-2">{{exchangingStatus ? 'Exchanged' : 'Exchanging'}}</span>
               </div>
               <div style="height: 35px; border: 2px solid rgba(61,61,112,.04);" class="md:w-1/3 w-full mb-1 md:mx-1 flex items-center justify-center">
                 <font-awesome-icon v-if="sendingStatus" :icon="faCheckCircle" size="lg" style="color: #3bee81;"/>
                 <font-awesome-icon v-else-if="exchangingStatus"  :icon="spinner" size="lg" rotation="180" spin style="color: #3bee81;"/>
                 <font-awesome-icon v-else :icon="faCircleNotch" size="lg" style="color: #E9E7EF;"/>
-                <span class="ml-2">Sending to your wallet</span>
+                <span class="ml-2">{{sendingStatus ? 'Sent to your wallet' : 'Sending to your wallet'}}</span>
               </div>
             </div>
             <div v-if="transaction.status === statuses.failed" class="px-4 py-3 rounded my-1" style="background-color: #fff5f5;	">
               <span class="block sm:inline" style="color: #e53e3e;">Error during exchange. Please contact support.</span>
-            </div>
-            <div v-if="transaction.status === statuses.finished" class="px-4 py-3 rounded my-1" style="background-color: #f0fff4;	">
-              <span class="block sm:inline" style="color: #38a169;">Exchange completed.</span>
-            </div>
-            <div v-if="transaction.status === statuses.finished" style="padding: 5px 65px 5px 10px;" class="mb-1">
-              <div style="${stepThreeBlock}">
-                <p style="${infoHeader} font-weight: 600;">Input Transaction Hash</p>
-                <p style="${infoHeader} font-size: 16px; word-break: break-all;">
-                  <a style="color: #3bee81;"  target="_blank" :href="payinHashLink">{{transaction.payinHash}}</a>
-                </p>
-              </div>
-              <div style="${stepThreeBlock}">
-                <p style="${infoHeader} font-weight: 600;">Output Transaction Hash</p>
-                <p style="${infoHeader} font-size: 16px;  word-break: break-all;">
-                  <a style="color: #3bee81;" target="_blank" :href="payoutHashLink">{{transaction.payoutHash}}</a>
-                </p>
-              </div>
-            </div>
-            <div v-if="transaction.status === statuses.finished" class="px-2 py-1 flex items-center justify-center">
-              <p style="width: 150px; color: #333; text-align: center;">Write about your experience on</p>
-              <a href="https://www.trustpilot.com/review/changenow.io" target="_blank">
-                <div style="width: 100px;">${trustPilotIcon()}</div>
-              </a>  
             </div>
             <div class="px-2 py-1 rounded my-1" style="background-color: rgba(61,61,112,.04);">
               <p class="mb-1" style="color: #333;">If you have any questions about your exchange, please contact our support team via email.</p>
               <a style="color: #3bee81;" href="mailto: support@changenow.io">support@changenow.io</a>
           </div>
           </div>
+        </div>
+        <div v-if="currentStep === 4 && transaction" class="lg:w-11/12">
+          <div class="px-2 py-2 rounded my-1 flex flex-col justify-center items-center" style="background-color: rgba(61,61,112,.04);">
+            <div style="${transactionSuccessIcon}">
+              <img src="https://changenow.io/images/exchange/check.svg"/>
+            </div>
+            <p style="font-size: 26px; font-weight: 700; margin-botom: 10px;">Transaction is completed!</p>
+            <p v-if="hasProfit" style="font-size: 17px; font-weight: 700;">
+              You earned <span style="color: #3bee81;">{{hasProfit}}</span>  more than was expected!</p>
+          </div>
+          <div style="${smallStep}">
+            <div style="${smallStepHeader}">
+              <div style="${smallStepNumber}">1</div>
+              <p style="${smallStepName}">Your {{transaction.fromCurrency.toUpperCase()}} Wallet</p>
+              <span style="${stepHeaderText}">{{ parseDate(transaction.depositReceivedAt) }}</span>
+            </div>
+            <div class="flex">
+              <div style="${smallStepInfoIcon}">
+                <img style="width: 52px" src="https://changenow.io/images/exchange/wallet-icon.svg"/>
+              </div>
+              <div style="padding-left: 33px;">
+                <div style="${smallStepInfoItem}">
+                  <p style="${stepInfoHead} width: 240px;">Input Transaction Hash</p>
+                  <p style="font-size: 15px; letter-spacing: .3px;  word-break: break-all;">
+                    <a style="color: #3bee81; word-break: break-all;" :href="payinHashLink" target="_blank">
+                      {{transaction.payinHash}}
+                    </a>
+                    <ButtonClipboard :value="payinHashLink" class="text-theme-page-text-light mx-2"/>
+                  </p>
+                </div>
+                <div style="${smallStepInfoItem}">
+                  <p style="${stepInfoHead} width: 240px;">ChangeNOW Address</p>
+                  <p style="font-size: 15px; letter-spacing: .3px;  word-break: break-all;">
+                    <a style="color: #3bee81; word-break: break-all;" :href="payinAddressLink" target="_blank">
+                      {{transaction.payinAddress}}
+                    </a>
+                    <ButtonClipboard :value="payinAddressLink" class="text-theme-page-text-light mx-2"/>
+                  </p>
+                </div>
+              <div style="${smallStepInfoItem}">
+                <p style="${stepInfoHead} font-weight: 700; width: 240px;">Amount Sent</p>
+                <p style="font-size: 15px; letter-spacing: .3px;  word-break: break-all; font-weight: 700;  word-break: break-all;">
+                  {{transaction.amountSend}} {{transaction.fromCurrency.toUpperCase()}}
+                </p>
+              </div>
+              </div>
+            </div>
+          </div>
+          <div style="${smallStep}">
+            <div style="${smallStepHeader}">
+              <div style="${smallStepNumber}">2</div>
+              <p style="${smallStepName}">Your {{transaction.toCurrency.toUpperCase()}} Wallet</p>
+              <span style="${stepHeaderText}">{{ parseDate(transaction.updatedAt) }}</span>
+            </div>
+            <div class="flex">
+              <div style="${smallStepInfoIcon}">
+                <img style="width: 52px" src="https://changenow.io/images/exchange/exchange-icon.svg"/>
+              </div>
+              <div style="padding-left: 33px;">
+                <div style="${smallStepInfoItem}">
+                  <p style="${stepInfoHead} width: 240px;">Output Transaction Hash</p>
+                  <p style="font-size: 15px; letter-spacing: .3px;  word-break: break-all;">
+                    <a style="color: #3bee81; word-break: break-all;" :href="payoutHashLink" target="_blank">
+                      {{transaction.payoutHash}}
+                    </a>
+                    <ButtonClipboard :value="payoutHashLink" class="text-theme-page-text-light mx-2"/>
+                  </p>
+                </div>
+                <div style="${smallStepInfoItem}">
+                  <p style="${stepInfoHead} width: 240px;">Your {{transaction.toCurrency.toUpperCase()}} Address</p>
+                  <p style="font-size: 15px; letter-spacing: .3px;  word-break: break-all;">
+                    <a style="color: #3bee81; word-break: break-all;" target="_blank"
+                      :href="payoutAddressLink">
+                      {{transaction.payoutAddress}}
+                    </a>
+                    <ButtonClipboard :value="payoutAddressLink" class="text-theme-page-text-light mx-2"/>
+                  </p>
+                </div>
+              <div style="${smallStepInfoItem}">
+                <p style="${stepInfoHead} font-weight: 700; width: 240px;">Amount Received</p>
+                <p style="font-size: 15px; letter-spacing: .3px;  word-break: break-all; font-weight: 700;  word-break: break-all;">
+                {{transaction.amountReceive}} {{transaction.toCurrency.toUpperCase()}}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
         </div>
       </div>
     </div>
@@ -571,16 +664,44 @@ module.exports = {
     },
     payinHashLink () {
       if (this.transaction && this.transaction.status === statuses.finished) {
-        return this.fullTo ? this.fullTo.transactionExplorerMask.replace('$$', this.transaction.payinHash) :  '';
+        return this.fullFrom ? this.fullFrom.transactionExplorerMask.replace('$$', this.transaction.payinHash) :  '';
+      } return '';
+    },
+    payinAddressLink () {
+      if (this.transaction && this.transaction.status === statuses.finished) {
+        return this.fullFrom ? this.fullFrom.addressExplorerMask.replace('$$', this.transaction.payinAddress) :  '';
+      } return '';
+    },
+    payoutAddressLink () {
+      if (this.transaction && this.transaction.status === statuses.finished) {
+        return this.fullTo ? this.fullTo.addressExplorerMask.replace('$$', this.transaction.payoutAddress) :  '';
       } return '';
     },
     payoutHashLink () {
       if (this.transaction && this.transaction.status === statuses.finished) {
-        return this.fullFrom ? this.fullFrom.transactionExplorerMask.replace('$$', this.transaction.payoutHash) :  '';
+        return this.fullTo ? this.fullTo.transactionExplorerMask.replace('$$', this.transaction.payoutHash) :  '';
+      } return '';
+    },
+    exchangeRate () {
+      if (this.transaction && this.transaction.status === statuses.finished) {
+        const { amountReceive, amountSend, fromCurrency, toCurrency } = this.transaction;
+        const rate = Number(amountReceive) / Number(amountSend);
+        return `1 ${fromCurrency.toUpperCase()} ≈ ${rate.toFixed(7)} ${toCurrency.toUpperCase()}`
+      } return '';
+    },
+    hasProfit () {
+      if (this.transaction && this.transaction.status === statuses.finished) {
+        const { amountReceive, expectedReceiveAmount, toCurrency } = this.transaction;
+        const profit = Number(amountReceive) - Number(expectedReceiveAmount);
+        return profit > 0 ? `${profit.toFixed(8)} ${toCurrency.toUpperCase()}` : ''
       } return '';
     }
   },
   methods: {
+    parseDate (date) {
+      const time = new Date(date);
+      return time.toLocaleString();
+    },
     outSideClick (event) {
       const domElements = event.path;
       const cfl = this.refs.currencySelectFrom;
@@ -768,14 +889,21 @@ module.exports = {
       const { id } = this.transaction;
       try {
         const transactionData = await this.api.getTransactionStatus(id);
+        transactionData.id = '5bbd2389440b0a';
+        // transactionData.status = mokStatuses[this.counter];
+        // this.counter++
         if (!this.fullTo || !this.fullFrom) {
-          const [ from, to ] = await Promise.all([this.api.getCurrencyInfo(transactionData.fromCurrency), this.api.getCurrencyInfo(transactionData.toCurrency)]);
+          const [ from, to ] = await Promise.all([this.api.getCurrencyInfo(transactionData.fromCurrency),
+                 this.api.getCurrencyInfo(transactionData.toCurrency)]);
           this.fullFrom = from;
           this.fullTo = to;
         }
   
         this.transaction = transactionData;
         if (finishedStatuses.includes(transactionData.status)) {
+          if (transactionData.status === statuses.finished) {
+            this.currentStep = 4;
+          }
           walletApi.storage.set('transactionId', null);
           walletApi.timers.clearInterval(this.statusTimer);
         }
