@@ -397,10 +397,10 @@ module.exports = {
                 <span class="ml-2">{{exchangingStatus ? 'Exchanged' : 'Exchanging'}}</span>
               </div>
               <div style="height: 35px; border: 2px solid rgba(61,61,112,.04);" class="md:w-1/3 w-full mb-1 md:mx-1 flex items-center justify-center">
-                <font-awesome-icon v-if="sendingStatus" :icon="faCheckCircle" size="lg" style="color: #3bee81;"/>
-                <font-awesome-icon v-else-if="exchangingStatus"  :icon="spinner" size="lg" rotation="180" spin style="color: #3bee81;"/>
+                <font-awesome-icon v-if="isExchangeFinishedSuccess" :icon="faCheckCircle" size="lg" style="color: #3bee81;"/>
+                <font-awesome-icon v-else-if="sendingStatus"  :icon="spinner" size="lg" rotation="180" spin style="color: #3bee81;"/>
                 <font-awesome-icon v-else :icon="faCircleNotch" size="lg" style="color: #E9E7EF;"/>
-                <span class="ml-2">{{sendingStatus ? 'Sent to your wallet' : 'Sending to your wallet'}}</span>
+                <span class="ml-2">{{isExchangeFinishedSuccess ? 'Sent to your wallet' : 'Sending to your wallet'}}</span>
               </div>
             </div>
             <div v-if="transaction.status === statuses.failed" class="px-4 py-3 rounded my-1" style="background-color: #fff5f5;	">
@@ -413,13 +413,14 @@ module.exports = {
           </div>
         </div>
         <div v-if="currentStep === 4 && transaction" class="lg:w-11/12">
-          <div class="px-2 py-2 rounded my-1 flex flex-col justify-center items-center" style="background-color: rgba(61,61,112,.04);">
+          <div class="relative px-2 py-2 rounded my-1 flex flex-col justify-center items-center" style="background-color: rgba(61,61,112,.04);">
             <div style="${transactionSuccessIcon}">
               <img src="https://changenow.io/images/exchange/check.svg"/>
             </div>
             <p style="font-size: 26px; font-weight: 700; margin-botom: 10px;">Transaction is completed!</p>
             <p v-if="hasProfit" style="font-size: 17px; font-weight: 700;">
               You earned <span style="color: #3bee81;">{{hasProfit}}</span>  more than was expected!</p>
+              <button class="absolute" style="margin-left: auto; color: #3bee81; right: 10px; top: 10px;" @click="startNewTransaction">Start new transaction</button>
           </div>
           <div style="${smallStep}">
             <div style="${smallStepHeader}">
@@ -435,7 +436,7 @@ module.exports = {
                 <div style="${smallStepInfoItem}">
                   <p style="${stepInfoHead} width: 240px;">Input Transaction Hash</p>
                   <p style="font-size: 15px; letter-spacing: .3px;  word-break: break-all;">
-                    <a style="color: #3bee81; word-break: break-all;" :href="payinHashLink" target="_blank">
+                    <a style="color: #3bee81; word-break: break-all; user-select: all;" :href="payinHashLink" target="_blank">
                       {{transaction.payinHash}}
                     </a>
                     <ButtonClipboard :value="payinHashLink" class="text-theme-page-text-light mx-2"/>
@@ -444,7 +445,7 @@ module.exports = {
                 <div style="${smallStepInfoItem}">
                   <p style="${stepInfoHead} width: 240px;">ChangeNOW Address</p>
                   <p style="font-size: 15px; letter-spacing: .3px;  word-break: break-all;">
-                    <a style="color: #3bee81; word-break: break-all;" :href="payinAddressLink" target="_blank">
+                    <a style="color: #3bee81; word-break: break-all; user-select: all;" :href="payinAddressLink" target="_blank">
                       {{transaction.payinAddress}}
                     </a>
                     <ButtonClipboard :value="payinAddressLink" class="text-theme-page-text-light mx-2"/>
@@ -473,7 +474,7 @@ module.exports = {
                 <div style="${smallStepInfoItem}">
                   <p style="${stepInfoHead} width: 240px;">Output Transaction Hash</p>
                   <p style="font-size: 15px; letter-spacing: .3px;  word-break: break-all;">
-                    <a style="color: #3bee81; word-break: break-all;" :href="payoutHashLink" target="_blank">
+                    <a style="color: #3bee81; word-break: break-all; user-select: all;" :href="payoutHashLink" target="_blank">
                       {{transaction.payoutHash}}
                     </a>
                     <ButtonClipboard :value="payoutHashLink" class="text-theme-page-text-light mx-2"/>
@@ -482,7 +483,7 @@ module.exports = {
                 <div style="${smallStepInfoItem}">
                   <p style="${stepInfoHead} width: 240px;">Your {{transaction.toCurrency.toUpperCase()}} Address</p>
                   <p style="font-size: 15px; letter-spacing: .3px;  word-break: break-all;">
-                    <a style="color: #3bee81; word-break: break-all;" target="_blank"
+                    <a style="color: #3bee81; word-break: break-all; user-select: all;" target="_blank"
                       :href="payoutAddressLink">
                       {{transaction.payoutAddress}}
                     </a>
@@ -505,7 +506,8 @@ module.exports = {
   components: {
     // 'font-awesome-icon': walletApi.icons.component,
     // Loader: walletApi.components.Loader,
-    // InputSelect: walletApi.components.Input.InputSelect
+    // InputSelect: walletApi.components.Input.InputSelect,
+    // ButtonClipboard: walletApi.components.Button.ButtonClipboard
   },
   data () {
     return {
@@ -637,14 +639,14 @@ module.exports = {
     confirmingStatus () {
       if (this.transaction) {
         const { status } = this.transaction;
-        return status === statuses.confirming || status === statuses.exchanging || status === statuses.sending;
+        return  status === statuses.exchanging || status === statuses.sending;
       } 
       return false;
     },
     exchangingStatus () {
       if (this.transaction) {
         const { status } = this.transaction;
-        return status === statuses.exchanging || status === statuses.sending;
+        return status === statuses.sending;
       } 
       return false;
     },
@@ -659,6 +661,13 @@ module.exports = {
       if (this.transaction) {
         const { status } = this.transaction;
         return this.finishedStatuses.includes(status);
+      } 
+      return false;
+    },
+    isExchangeFinishedSuccess () {
+      if (this.transaction) {
+        const { status } = this.transaction;
+        return status === statuses.finished;
       } 
       return false;
     },

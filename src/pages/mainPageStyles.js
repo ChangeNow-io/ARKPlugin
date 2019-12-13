@@ -10,6 +10,7 @@ const formContainer = `
   align-items: center;
   justify-content: center;
   background:  radial-gradient(ellipse 390px 390px at 0% 40%, rgba(109, 107, 217, 0.3), #2B2B37, transparent);
+  z-index: 1;
 `;
 
 const mainContainer = `
