@@ -3,7 +3,7 @@ const style = require('./mainPageStyles');
 const stepperStyle = require('./stepperStyles');
 const { defaultFrom, defaultTo } = require('../config.json');
 
-const { errorType, longName, statuses, finishedStatuses, mokStatuses } = require('../constants');
+const { errorType, longName, statuses, finishedStatuses } = require('../constants');
 const { valiateAddress, valiateExternalId } = require('../utils/validators');
 const trustPilotIcon = require('../components/renderTrustpilot');
 
@@ -98,12 +98,6 @@ const {
   faLongArrowAltUp, 
   faSearch, faArrowRight, faCheck, faCheckCircle, faTimesCircle, faCircleNotch, faCircle, faExternalLinkAlt } = walletApi.fontAwesomeIcons;
 
-// const { 
-//   faArrowsAltV, 
-//   faSpinner, 
-//   faLongArrowAltDown, 
-//   faLongArrowAltUp, 
-//   faSearch, faArrowRight, faCheck, faCheckCircle, faTimesCircle, faCircleNotch, faCircle, faExternalLinkAlt } = walletApi.icons.icons;
 
 module.exports = {
   template: `
@@ -388,7 +382,7 @@ module.exports = {
               <div style="height: 35px; border: 2px solid rgba(61,61,112,.04);" class="md:w-1/3 w-full mb-1 md:mx-1  flex items-center justify-center">
                 <font-awesome-icon v-if="confirmingStatus" :icon="faCheckCircle" size="lg" style="color: #3bee81;"/>
                 <font-awesome-icon v-else :icon="spinner" size="lg" rotation="180" spin style="color: #3bee81;"/>
-                <span class="ml-2">{{confirmingStatus ? 'Deposite received' : 'Awaiting deposit'}}</span>
+                <span class="ml-2">{{confirmingStatus ? 'Deposit received' : 'Awaiting deposit'}}</span>
               </div>
               <div style="height: 35px; border: 2px solid rgba(61,61,112,.04);" class="md:w-1/3 w-full mb-1 md:mx-1  flex items-center justify-center">
                 <font-awesome-icon v-if="exchangingStatus" :icon="faCheckCircle" size="lg" style="color: #3bee81;"/>
@@ -439,7 +433,7 @@ module.exports = {
                     <a style="color: #3bee81; word-break: break-all; user-select: all;" :href="payinHashLink" target="_blank">
                       {{transaction.payinHash}}
                     </a>
-                    <ButtonClipboard :value="payinHashLink" class="text-theme-page-text-light mx-2"/>
+                    <ButtonClipboard :value="transaction.payinHash" class="text-theme-page-text-light mx-2"/>
                   </p>
                 </div>
                 <div style="${smallStepInfoItem}">
@@ -448,7 +442,7 @@ module.exports = {
                     <a style="color: #3bee81; word-break: break-all; user-select: all;" :href="payinAddressLink" target="_blank">
                       {{transaction.payinAddress}}
                     </a>
-                    <ButtonClipboard :value="payinAddressLink" class="text-theme-page-text-light mx-2"/>
+                    <ButtonClipboard :value="transaction.payinAddress" class="text-theme-page-text-light mx-2"/>
                   </p>
                 </div>
               <div style="${smallStepInfoItem}">
@@ -477,7 +471,7 @@ module.exports = {
                     <a style="color: #3bee81; word-break: break-all; user-select: all;" :href="payoutHashLink" target="_blank">
                       {{transaction.payoutHash}}
                     </a>
-                    <ButtonClipboard :value="payoutHashLink" class="text-theme-page-text-light mx-2"/>
+                    <ButtonClipboard :value="transaction.payoutHash" class="text-theme-page-text-light mx-2"/>
                   </p>
                 </div>
                 <div style="${smallStepInfoItem}">
@@ -487,7 +481,7 @@ module.exports = {
                       :href="payoutAddressLink">
                       {{transaction.payoutAddress}}
                     </a>
-                    <ButtonClipboard :value="payoutAddressLink" class="text-theme-page-text-light mx-2"/>
+                    <ButtonClipboard :value="transaction.payoutAddress" class="text-theme-page-text-light mx-2"/>
                   </p>
                 </div>
               <div style="${smallStepInfoItem}">
@@ -504,10 +498,6 @@ module.exports = {
     </div>
   `,
   components: {
-    // 'font-awesome-icon': walletApi.icons.component,
-    // Loader: walletApi.components.Loader,
-    // InputSelect: walletApi.components.Input.InputSelect,
-    // ButtonClipboard: walletApi.components.Button.ButtonClipboard
   },
   data () {
     return {
@@ -898,9 +888,6 @@ module.exports = {
       const { id } = this.transaction;
       try {
         const transactionData = await this.api.getTransactionStatus(id);
-        transactionData.id = '5bbd2389440b0a';
-        // transactionData.status = mokStatuses[this.counter];
-        // this.counter++
         if (!this.fullTo || !this.fullFrom) {
           const [ from, to ] = await Promise.all([this.api.getCurrencyInfo(transactionData.fromCurrency),
                  this.api.getCurrencyInfo(transactionData.toCurrency)]);
@@ -983,12 +970,6 @@ module.exports = {
     async startNewTransaction () {
       walletApi.storage.set('transactionId', null);
       walletApi.route.goTo('change-now');
-      // this.transaction = null;
-      // this.currentStep = 1;
-      // this.recipientWallet = ''
-      // this.refundWallet = ''
-      // this.externalId = ''
-      // await this.initialize();
     },
     setArkAddress (value) {
       if (!value) {

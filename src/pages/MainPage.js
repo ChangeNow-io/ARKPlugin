@@ -40,7 +40,6 @@ const {
 
 
 const { faArrowsAltV, faSpinner, faLongArrowAltDown, faLongArrowAltUp, faSearch, faExternalLinkAlt } = walletApi.fontAwesomeIcons;
-// const { faArrowsAltV, faSpinner, faLongArrowAltDown, faLongArrowAltUp, faSearch, faExternalLinkAlt } = walletApi.icons.icons;
 
 
 module.exports = {
@@ -174,8 +173,6 @@ module.exports = {
     </div>
   `,
   components: {
-    // 'font-awesome-icon': walletApi.icons.component,
-    // Loader: walletApi.components.Loader
   },
   data () {
     return {
@@ -241,7 +238,6 @@ module.exports = {
   methods: {
     outSideClick (event) {
       const domElements = event.path;
-      console.log(this);
       const cfl = this.refs.currencySelectFrom;
       const ctl = this.refs.currencySelectTo;
       if (!cfl || !ctl) {
@@ -395,7 +391,6 @@ module.exports = {
     this.api = new ApiWorker(walletApi.http);
   },
   async mounted() {
-    console.log(walletApi);
     this.longName = longName;
     await this.initialize();
   },
