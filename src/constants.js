@@ -1,6 +1,3 @@
-const defaultFrom = 'btc';
-const defaultTo = 'ark';
-
 const longName = {  
 	bnbmainnet: { 
 		ticker: 'bnb',
@@ -17,7 +14,6 @@ const errorType = {
 	SMALL_DEPOSIT: 'deposit_too_small'
 }
   
-
 const statuses = {
 	waiting: 'waiting', 
 	confirming:  'confirming', 
@@ -31,14 +27,9 @@ const statuses = {
   
 const finishedStatuses = [ 'finished', 'failed', 'refunded', 'expired' ];
 
-const mokStatuses = ['new', 'waiting', 'confirming', 'exchanging', 'sending', 'finished', 'failed'];
-
 module.exports = {
-	defaultFrom,
-	defaultTo,
 	longName,
 	errorType,
 	statuses,
 	finishedStatuses,
-	mokStatuses
 }
