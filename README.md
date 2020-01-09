@@ -1,13 +1,9 @@
-## ChangeNOW plugin for Ark Desktop Wallet
+## ChangeNOW plugin for cryptocurrency exchange in ARK Desktop Wallet.
 
-Для корректной работы плагина необхоимо настроить параметры в файле `src/config.json`.
-Файл содержит следущие параметры:
-- `deafultFrom` - Дефолтная валюта которую необходимо обменять. Указывается ticker валюты,
-например: `btc`.
-
-- `deafultTo` - Дефолтная валюта которую получим при обмене. Указывается ticker валюты,
-например: `ark`.
-
-- `deafultAmount` - Количество валюты `from` для обмена.
-
-- `api_key` - Api key партнера changeNow, без указания ключа невозможно создать обмен.
+This plugin will be auto-discovered inside ARK Desktop Wallet by the ARK Plugin Manager.
+For the plugin to work correctly, you must configure the parameters in the file `src/config.json`.
+The file contains the following parameters:
+- `deafultFrom` - default currency which will be exchanged. You should write a currency ticker, for example: `btc`.
+- `deafultTo` - default currency which will be got after the exchange. You should write a currency ticker, for example: `ark`.
+- `deafultAmount` - currency amount `from` for exchange.
+- `api_key` - ChangeNOW partner API Key. Without it you can’t create the exchange.
