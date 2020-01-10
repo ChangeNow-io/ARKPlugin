@@ -1,7 +1,7 @@
 {
   "name": "cn-ark-plugin",
   "author": "ChangeNOW",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "title": "ChangeNOW Plugin",
   "description": "ChangeNOW plugin on Ark Desktop Wallet",
   "main": "src/index.js",
