@@ -14,7 +14,7 @@
     "exchange",
     "swap"
   ],
-  "logo": "https://github.com/ChangeNow-io/ARKPlugin/master/logo.png",
+  "logo": "https://raw.githubusercontent.com/ChangeNow-io/ARKPlugin/master/logo.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/ChangeNow-io/ARKPlugin.git"
