@@ -3,6 +3,7 @@ const colorGreen = '#3bee81';
 const pluginContainer = `
   background: #2B2B37 radial-gradient(ellipse 210px 210px at 100% 40%, rgba(110, 14, 125, 0.2), #2B2B37);
   position: relative;
+  padding: 0;
 `;
 const formContainer = `
   flex: 1;
@@ -33,7 +34,7 @@ const mainHeader = `
 `;
 
 const subTitle = `
-  margin-bottom: 50px;
+  margin-bottom: 30px;
   font-size: 28px;
   color: #5c5780;
 `;
@@ -254,6 +255,47 @@ const sreachIcon = `
   top: 10px;
 `;
 
+const footer =`
+  padding: 21px 0px;
+  width: 100%;
+  text-align: center;
+  background: linear-gradient(270deg, #CDBAFF 0%, #5E5AE2 97.43%);
+  font-size: 20px;
+  color: white;
+  text-transform: capitalize;
+  font-weight: 600;
+`; 
+
+const starsSubTitle =`
+  margin-bottom: 30px;
+  max-width: 270px;
+  display: inline-block;
+  position: relative;
+  text-transform: capitalize;
+`;
+
+const starsSubTitleText =`
+  color: #FFC24A;
+  font-size: 18px;
+  font-weight: 600;
+`;
+
+const bigStar = `
+  position: absolute;
+  right: -18px;
+  top: -24px;
+  width: 16px;
+  height: auto;
+`;
+
+const smallStar = `
+  position: absolute;
+  right: -30px;
+  top: 0;
+  width: 10px;
+  height: auto;
+`;
+
 module.exports = {
   mainContainer,
   mainHeader,
@@ -287,5 +329,10 @@ module.exports = {
   subName,
   mainPageHeader,
   pluginContainer,
-  formContainer
+  formContainer,
+  footer,
+  starsSubTitle,
+  bigStar,
+  smallStar,
+  starsSubTitleText,
 }
