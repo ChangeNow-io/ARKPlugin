@@ -267,7 +267,7 @@ const footer =`
 `; 
 
 const starsSubTitle =`
-  margin-bottom: 30px;
+  margin-bottom: 20px;
   max-width: 270px;
   display: inline-block;
   position: relative;
@@ -295,6 +295,13 @@ const smallStar = `
   width: 10px;
   height: auto;
 `;
+
+const trustpilot = `
+  width: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`
 
 module.exports = {
   mainContainer,
@@ -335,4 +342,5 @@ module.exports = {
   bigStar,
   smallStar,
   starsSubTitleText,
+  trustpilot,
 }
