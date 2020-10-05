@@ -284,9 +284,7 @@ module.exports = {
             <button v-else style="${stepButton} ${buttonGreen}" 
             class="hover:opacity-75 disabled:bg-gray" :disabled="!validParams" 
             @click.prevent="switchToTwoStep">Next</button>
-            <router-link :to="{ name: 'change-now'}">
-              <button class="hover:opacity-75" style="${stepButton} ${buttonWhite}">Back</button>
-            </router-link>  
+            <button @click="goTo('change-now')" class="hover:opacity-75" style="${stepButton} ${buttonWhite}">Back</button>
           </div>
         </div>
         <div v-if="currentStep === 2" style="${stepContainer}">
@@ -697,6 +695,9 @@ module.exports = {
     }
   },
   methods: {
+    goTo (route) {
+      walletApi.route.goTo(route);
+    },
     parseDate (date) {
       const time = new Date(date);
       return time.toLocaleString();
@@ -969,7 +970,7 @@ module.exports = {
     },
     async startNewTransaction () {
       walletApi.storage.set('transactionId', null);
-      walletApi.route.goTo('change-now');
+      this.goTo('change-now');
     },
     setArkAddress (value) {
       if (!value) {
